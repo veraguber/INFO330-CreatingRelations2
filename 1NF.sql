@@ -20,3 +20,6 @@ DROP TABLE Ability;
 UPDATE Abilities SET ability_name = REPLACE(REPLACE(ability_name, '[', ''), ']', '');
 --Getting rid of any leading or trailing whitespace--
 UPDATE Abilities SET ability_name = TRIM(ability_name);
+
+--Getting rid of the abilities column--
+ALTER TABLE imported_pokemon_data DROP COLUMN abilites;
