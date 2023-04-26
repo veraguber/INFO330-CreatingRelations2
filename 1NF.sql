@@ -1,13 +1,22 @@
---Table with type is created which has an autoincrementing id and the type name which will be unique type names extracted from type1 and type2--
-CREATE TABLE Type (pokemon_id INTEGER, type_name VARCHAR(20) NOT NULL, FOREIGN KEY (pokemon_id) REFERENCES imported_pokemon_data (pokedex_number));
+--Creating a temporary table to hold the abilities from the csv file--
+CREATE TABLE Ability (id INTEGER PRIMARY KEY, ability_name TEXT);
 
---Inserting data into the type table--
-INSERT INTO TYPE(pokemon_id) SELECT pokedex_number FROM imported_pokemon_data;
-INSERT INTO Type(type_name) SELECT DISTINCT type1 FROM imported_pokemon_data UNION SELECT DISTINCT type2 FROM imported_pokemon_data WHERE pokemon_id == pokedex_number;
---There is now an id associated with every type seen in the csv file, some may not have an id since not every type has an associated value--
+--Inserting values into ability table so that they can be split and trimmed--
+INSERT INTO Ability (id, ability_name) SELECT pokedex_number, abilities FROM imported_pokemon_data;
 
---Need a table to represent the many-to-many relationship in the types which is represented below:--
-CREATE TABLE Pokemon_Type (pokemon_dex_id INTEGER, type_id INTEGER, PRIMARY KEY (pokemon_dex_id, type_id), FOREIGN KEY (pokemon_dex_id) REFERENCES imported_pokemon_data(pokedex_number), FOREIGN KEY (type_id) REFERENCES Type(pokemon_id));
+--Inserting unique abilities into the Abilities table utilizing the provided code in section--
+CREATE TABLE Abilities AS WITH
+--Uses a recursive split function to split the ability_name column into individual rows--
+split(id, ability_name, nextability) AS (SELECT id, '' AS ability_name, ability_name||',' AS nextability FROM Ability
+--Nextability is each ability_name string with a concatenated ,--
+--The union combines the first part with a recursive query that takes the ability_name from nextability--
+UNION ALL SELECT id, substr(nextability, 0, instr(nextability, ',')) AS ability_name, substr(nextability, instr(nextability, ',')+1) AS nextability FROM split WHERE nextability !='') SELECT id, ability_name FROM split WHERE ability_name !='' ORDER BY id;
+--Last part filters out empty ability rows, sorts by id and the output is a table with unique values in each row associated with an id.
 
---Inserting data into the pokemon type table--
-INSERT INTO OR IGNORE Pokemon_Type (pokemon_dex_id, type_id) SELECT p.pokedex_number, t.pokemon_id FROM imported_pokemon_data AS p JOIN Type AS t ON p.type1 = t.type_name OR p.type2 = t.type_name;
+--Dropping the placeholder table that was used to create the final Abilities table--
+DROP TABLE Ability;
+
+--Getting rid of the [] from the beginning and end of the strings--
+UPDATE Abilities SET ability_name = REPLACE(REPLACE(ability_name, '[', ''), ']', '');
+--Getting rid of any leading or trailing whitespace--
+UPDATE Abilities SET ability_name = TRIM(ability_name);
