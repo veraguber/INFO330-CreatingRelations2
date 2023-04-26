@@ -15,3 +15,5 @@ CREATE TABLE Pokemon_Type (pokemon_dex_id INTEGER, type_id INTEGER, PRIMARY KEY 
 --Inserting data into the pokemon type table--
 INSERT INTO OR IGNORE Pokemon_Type (pokemon_dex_id, type_id) SELECT p.pokedex_number, t.pokemon_id FROM imported_pokemon_data AS p JOIN Type AS t ON p.type1 = t.type_name OR p.type2 = t.type_name;
 
+ALTER TABLE imported_pokemon_data DROP COLUMN type1;
+ALTER TABLE imported_pokemon_data DROP COLUMN type2;
