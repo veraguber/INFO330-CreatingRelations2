@@ -13,4 +13,4 @@ INSERT INTO Pokemon_Base_Stats (pokedex_number, base_total, base_egg_steps, base
 --Getting rid of the appropriate columns--
 ALTER TABLE imported_pokemon_data DROP COLUMN attack, DROP COLUMN defense, DROP COLUMN sp_attack, DROP COLUMN sp_defense, DROP COLUMN speed, DROP COLUMN hp;
 
-ALTER TABLE imported_pokemon_data DROP COLUMN base_total, DROP COLUMN base_egg_steps, DROP COLUMN base_happiness, DROP COLUMN base_happiness, DROP COLUMN experience_growth;
+ALTER TABLE imported_pokemon_data DROP COLUMN base_total, DROP COLUMN base_egg_steps, DROP COLUMN base_happiness, DROP COLUMN experience_growth;
